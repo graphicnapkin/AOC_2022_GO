@@ -3,6 +3,7 @@ package main
 import (
 	"AOC/day4/input"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -15,7 +16,7 @@ func main(){
 
 func part1(data []string){
   input := parseInput(data)
-  for k, v := range input.boards[0]{
+  for k, v := range input.boards[0].grid{
     fmt.Println(k,v)
   }
 }
@@ -39,17 +40,20 @@ func parseInput(data []string) Input{
   input.bingoNumbers = strings.Split(data[0], ",")
 
   tempStringBoard := []string{}
-  newBoard := make(Board) 
+  var newBoard Board
+  newBoard.grid = make(Grid)
   //the inputs second row will always be blank so start at the third row (index 2)
   for i := 2; i < len(data); i++ {
     if len(data[i]) == 0 {
       for y := 0; y < len(tempStringBoard); y++{
-        for x := 0; x < len(tempStringBoard[0]); x++ {
-          newBoard[Postition{x,y}] = false
+        //split by spaces
+        //itterate though each position
+        //save the data in a map with number in that position as the key, x,y pos as value
+        //add this number to total basescore value
         }
       }
       input.boards = append(input.boards, newBoard)
-      newBoard = make(Board) 
+      newBoard.grid = make(Grid)
     } else {
       tempStringBoard = append(tempStringBoard, data[i])
     }
@@ -62,9 +66,12 @@ type Input struct{
   boards []Board
 }
 
-type Postition struct {
+type Grid map[string]struct{
   x int
-  y int 
+  y int
 } 
 
-type Board map[Postition]bool
+type Board struct {
+  grid Grid
+  baseScore int
+}
