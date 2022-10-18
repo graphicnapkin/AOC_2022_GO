@@ -3,8 +3,9 @@ package main
 import (
 	"AOC/day4/input"
 	"fmt"
-	"strconv"
 	"strings"
+  "strconv"
+
 )
 
 func main(){
@@ -15,10 +16,10 @@ func main(){
 }
 
 func part1(data []string){
-  input := parseInput(data)
-  for k, v := range input.boards[0].grid{
-    fmt.Println(k,v)
-  }
+  parseInput(data)
+//  for k, v := range input.boards[0].grid{
+//    fmt.Println(k,v)
+//  }
 }
 
 func part2(data []string){
@@ -36,26 +37,32 @@ func part2(data []string){
 
 func parseInput(data []string) Input{
   var input Input
+  var tempBoardScore int
   //the inputs first row will always be the numbers pulled
-  input.bingoNumbers = strings.Split(data[0], ",")
+  bingoNumbers := strings.Split(data[0], ",")
+  stringBoards := data[2:]
 
-  tempStringBoard := []string{}
-  var newBoard Board
-  newBoard.grid = make(Grid)
-  //the inputs second row will always be blank so start at the third row (index 2)
-  for i := 2; i < len(data); i++ {
-    if len(data[i]) == 0 {
-      for y := 0; y < len(tempStringBoard); y++{
-        //split by spaces
-        //itterate though each position
-        //save the data in a map with number in that position as the key, x,y pos as value
-        //add this number to total basescore value
+  for _, line := range stringBoards {
+    if line != "" {
+      row := strings.Split(line," ")
+      for _, item := range row {
+        fmt.Println(item)
+        hitNumber := false
+        for _, currentNumber := range bingoNumbers {
+          if currentNumber == item {
+            hitNumber = true
+          }
+        }
+        if !hitNumber {
+          fmt.Println(item)
+          val, _ := strconv.Atoi(item)
+          tempBoardScore += val
+          fmt.Println(item)
         }
       }
-      input.boards = append(input.boards, newBoard)
-      newBoard.grid = make(Grid)
     } else {
-      tempStringBoard = append(tempStringBoard, data[i])
+      fmt.Println(tempBoardScore)
+      tempBoardScore = 0
     }
   }
   return input
@@ -65,13 +72,12 @@ type Input struct{
   bingoNumbers []string
   boards []Board
 }
-
 type Grid map[string]struct{
   x int
   y int
-} 
+}
 
 type Board struct {
-  grid Grid
+  grid []string
   baseScore int
 }
