@@ -1,8 +1,8 @@
 package input
 
-func Data() ([]int, []int) {
-  test := []int{00}
-  data := []int{01}
+func Data() ([]string, []string) {
+  test := []string{"test_data"}
+  data := []string{"real_data"}
   return test, data
 }
 

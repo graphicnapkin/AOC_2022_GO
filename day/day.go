@@ -1,7 +1,7 @@
 package main
 
 import (
-	"AOC/template/input"
+	"AOC/day/input"
 	"fmt"
 )
 

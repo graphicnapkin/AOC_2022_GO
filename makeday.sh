@@ -1,19 +1,30 @@
 #!/bin/bash
-read -p 'Data type (int, string, bool): ' dataType
-read -p 'Test data (comma separated): ' testData
-read -p 'Real data (comma separated): ' realData
-dayNumber=$1
+read -p 'What day is this for?
+' dayNumber
+
+read -p 'Copy test data to clipboard and hit enter
+'
+testData=$(eval "powershell.exe Get-Clipboard | sed 's/\r//' | sed 's/.*/\"&\"/' | sed -z 's/\n/,/g;s/,$/\n/'")
+
+read -p 'Copy real data to clipboard and hit enter
+'
+realData=$(eval "powershell.exe Get-Clipboard | sed 's/\r//' | sed 's/.*/\"&\"/' | sed -z 's/\n/,/g;s/,$/\n/'")
+
 dirName="day"$dayNumber
 mkdir $dirName 
 cp -r template/* $dirName/
+
 cd $dirName
-go mod init
+go mod init > /dev/null
+
 cd input
-go install
+go install > /dev/null
+
 cd ..
 mv day.go $dirName".go"
+
 sed -i "s/template/$dirName/" $dirName".go" 
-sed -i "s:int):$dataType):g" $dirName".go" 
-sed -i "s/00/$testData/" ./input/input.go
-sed -i "s/01/$realData/" ./input/input.go
-sed -i "s:int:$dataType:g" ./input/input.go
+sed -i "s/\"test_data\"/$testData/" ./input/input.go
+sed -i "s/\"real_data\"/$realData/" ./input/input.go
+
+nvim $dirName".go"

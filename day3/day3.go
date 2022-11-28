@@ -26,7 +26,7 @@ func part1(data []string){
   }
 
   gammaString := ""
-  epsilonString := "" 
+  epsilonString := ""
 
   //for each row and each position count either 0 or 1
   for _, row := range data {
@@ -67,7 +67,7 @@ func part1(data []string){
 }
 
 func part2(data []string){
-  oList := data 
+  oList := data
   co2List := data
 
   //loop through the oList once per character in each entry
@@ -76,7 +76,7 @@ func part2(data []string){
     //count how many 0's and 1's there are
     //keep only whichever char is most represented
     //if there is a tie, keep the 1's
-         
+
     //for each rating
         //count how many 0's and 1's are in 
   for i := 0; i < len(oList[0]); i++ {
