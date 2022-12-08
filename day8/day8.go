@@ -43,50 +43,38 @@ func part1(data []string) {
 }
 
 func checkDirection(data []string, x int, y int, height int, dir string) bool {
+	if y == 0 || y == len(data)-1 || x == 0 || x == len(data)-1 {
+		return true
+	}
+
+	newX := 0
+	newY := 0
+
 	if dir == "up" {
-		if y == 0 {
-			return true
-		}
-		nextSpot, _ := strconv.Atoi(string(data[y-1][x]))
-		if nextSpot >= height {
-			return false
-		}
-		return checkDirection(data, x, y-1, height, "up")
+		newX = x
+		newY = y - 1
 	}
 
 	if dir == "down" {
-		if y == len(data)-1 {
-			return true
-		}
-		nextSpot, _ := strconv.Atoi(string(data[y+1][x]))
-		if nextSpot >= height {
-			return false
-		}
-		return checkDirection(data, x, y+1, height, "down")
+		newX = x
+		newY = y + 1
 	}
 
 	if dir == "left" {
-		if x == 0 {
-			return true
-		}
-		nextSpot, _ := strconv.Atoi(string(data[y][x-1]))
-		if nextSpot >= height {
-			return false
-		}
-		return checkDirection(data, x-1, y, height, "left")
+		newX = x - 1
+		newY = y
 	}
 
 	if dir == "right" {
-		if x == len(data)-1 {
-			return true
-		}
-		nextSpot, _ := strconv.Atoi(string(data[y][x+1]))
-		if nextSpot >= height {
-			return false
-		}
-		return checkDirection(data, x+1, y, height, "right")
+		newX = x + 1
+		newY = y
 	}
-	return false
+
+	nextSpot, _ := strconv.Atoi(string(data[newY][newX]))
+	if nextSpot >= height {
+		return false
+	}
+	return checkDirection(data, newX, newY, height, dir)
 }
 
 func part2(data []string) {
@@ -115,50 +103,38 @@ func part2(data []string) {
 }
 
 func getDirectionScore(data []string, x int, y int, height int, score int, dir string) int {
+	if y == 0 || y == len(data)-1 || x == 0 || x == len(data)-1 {
+		return score
+	}
+
+	newX := 0
+	newY := 0
+
 	if dir == "up" {
-		if y == 0 {
-			return score
-		}
-		nextSpot, _ := strconv.Atoi(string(data[y-1][x]))
-		if nextSpot >= height {
-			return score + 1
-		}
-		return getDirectionScore(data, x, y-1, height, score+1, "up")
+		newX = x
+		newY = y - 1
 	}
 
 	if dir == "down" {
-		if y == len(data)-1 {
-			return score
-		}
-		nextSpot, _ := strconv.Atoi(string(data[y+1][x]))
-		if nextSpot >= height {
-			return score + 1
-		}
-		return getDirectionScore(data, x, y+1, height, score+1, "down")
+		newX = x
+		newY = y + 1
 	}
 
 	if dir == "left" {
-		if x == 0 {
-			return score
-		}
-		nextSpot, _ := strconv.Atoi(string(data[y][x-1]))
-		if nextSpot >= height {
-			return score + 1
-		}
-		return getDirectionScore(data, x-1, y, height, score+1, "left")
+		newX = x - 1
+		newY = y
 	}
 
 	if dir == "right" {
-		if x == len(data)-1 {
-			return score
-		}
-		nextSpot, _ := strconv.Atoi(string(data[y][x+1]))
-		if nextSpot >= height {
-			return score + 1
-		}
-		return getDirectionScore(data, x+1, y, height, score+1, "right")
+		newX = x + 1
+		newY = y
 	}
-	return 1
+
+	nextSpot, _ := strconv.Atoi(string(data[newY][newX]))
+	if nextSpot >= height {
+		return score + 1
+	}
+	return getDirectionScore(data, newX, newY, height, score+1, dir)
 }
 
 func input() ([]string, []string) {
