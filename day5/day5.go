@@ -1,124 +1,208 @@
 package main
 
 import (
-	"AOC/day5/input"
+	"encoding/csv"
 	"fmt"
+	"io"
+	"log"
+	"os"
 	"strconv"
 	"strings"
 )
 
-// this returns slighlty less than it should, not sure why
 func main() {
 	//[testData, realData]
-	data, _:= input.Data()
-  fmt.Println(len(data))
-
+	data, _ := input()
 	part1(data)
 	part2(data)
 }
 
 func part1(data []string) {
-	grid := make(map[string]int)
-	dangerousCords := 0
+	fmt.Println("Part 1")
+	initialStackState := [][]string{}
+	instructions := [][]int{}
+
+	pastInitialState := false
 
 	for _, row := range data {
-		start, end := getCoordinates(row)
-
-		if start.x == end.x {
-			currentY := start.y
-
-			for currentY >= end.y {
-				stringPos := fmt.Sprintf("%v,%v", start.x, currentY)
-				grid[stringPos] = grid[stringPos] + 1
-				currentY--
-			}
-
-			currentY = start.y
-
-			for currentY <= end.y {
-				stringPos := fmt.Sprintf("%v,%v", start.x, currentY)
-				grid[stringPos] = grid[stringPos] + 1
-				currentY++
-			}
-
-      continue
+		if row[1] == '1' {
+			pastInitialState = true
+			continue
 		}
 
-		if start.y == end.y {
-			currentX := start.x
-
-			for currentX >= end.x {
-				stringPos := fmt.Sprintf("%v,%v", currentX, start.y)
-				grid[stringPos] = grid[stringPos] + 1
-				currentX--
+		if !pastInitialState {
+			crates := []string{}
+			// each instruction is 4 characters long, with the letter in the second index
+			for i := 0; i < len(row); i += 4 {
+				if string(row[i+1]) != "" {
+					crates = append(crates, string(row[i+1]))
+				}
 			}
-
-			currentX = start.x
-
-			for currentX <= end.x {
-				stringPos := fmt.Sprintf("%v,%v", currentX, start.y)
-				grid[stringPos] = grid[stringPos] + 1
-				currentX++
+			initialStackState = append(initialStackState, crates)
+		} else {
+			stringRow := strings.Split(row, " ")
+			parsed := []int{}
+			for _, item := range stringRow {
+				if item != "move" && item != "from" && item != "to" {
+					number, _ := strconv.Atoi(item)
+					parsed = append(parsed, number)
+				}
 			}
-
-      continue
-		}
-
-    currentX := start.x
-    currentY := start.y
-
-    for currentX != end.x || currentY != end.y {
-      stringPos := fmt.Sprintf("%v,%v", currentX, currentY)
-      grid[stringPos] = grid[stringPos] + 1
-
-      if currentX < end.x{
-        currentX++
-      } else {
-        currentX--
-      }
-
-      if currentY < end.y{
-        currentY++
-      } else {
-        currentY--
-      }
-    }
-	}
-
-	for _, v := range grid {
-		if v > 1 {
-			dangerousCords++
+			instructions = append(instructions, parsed)
 		}
 	}
-	fmt.Println("Number of dangerous coordinates:", dangerousCords)
-}
 
-func part2(data []string) {
-	output := 0
+	stacks := make([]Stack, len(initialStackState[len(initialStackState)-1]))
+
+	for _, row := range initialStackState {
+		for i, column := range row {
+			if column != " " {
+				stacks[i].Push(column)
+			}
+		}
+	}
+
+	for _, instruction := range instructions {
+		numberToMove := instruction[0]
+		fromStack := instruction[1]
+		toStack := instruction[2]
+
+		for i := 0; i < numberToMove; i++ {
+			crateToMove, _ := stacks[fromStack-1].Pop()
+			stacks[toStack-1].AddCrate(crateToMove)
+		}
+	}
+
+	output := ""
+	for _, stack := range stacks {
+		output += stack[0]
+	}
 	fmt.Println(output)
 }
 
-func getCoordinates(row string) (Coordinate, Coordinate) {
-	items := strings.Split(row, " -> ")
+func part2(data []string) {
+	fmt.Println("Part 2")
+	initialStackState := [][]string{}
+	instructions := [][]int{}
 
-	firstCordString := strings.Split(items[0], ",")
-	firstX, _ := strconv.Atoi(firstCordString[0])
-	firstY, _ := strconv.Atoi(firstCordString[1])
+	pastInitialState := false
 
-	secondCordString := strings.Split(items[1], ",")
-	secondX, _ := strconv.Atoi(secondCordString[0])
-	secondY, _ := strconv.Atoi(secondCordString[1])
-
-	return Coordinate{
-			x: firstX,
-			y: firstY,
-		}, Coordinate{
-			x: secondX,
-			y: secondY,
+	for _, row := range data {
+		if row[1] == '1' {
+			pastInitialState = true
+			continue
 		}
+
+		if !pastInitialState {
+			crates := []string{}
+			for i := 0; i < len(row); i += 4 {
+				if string(row[i+1]) != "" {
+					crates = append(crates, string(row[i+1]))
+				}
+			}
+			initialStackState = append(initialStackState, crates)
+		} else {
+			stringRow := strings.Split(row, " ")
+			parsed := []int{}
+			for _, item := range stringRow {
+				if item != "move" && item != "from" && item != "to" {
+					number, _ := strconv.Atoi(item)
+					parsed = append(parsed, number)
+				}
+			}
+			instructions = append(instructions, parsed)
+		}
+	}
+
+	stacks := make([]Stack, len(initialStackState[len(initialStackState)-1]))
+
+	for _, row := range initialStackState {
+		for i, column := range row {
+			if column != " " {
+				stacks[i].Push(column)
+			}
+		}
+	}
+
+	for _, instruction := range instructions {
+		numberToMove := instruction[0]
+		fromStack := instruction[1]
+		toStack := instruction[2]
+
+		cratesToMove := []string{}
+
+		for i := 0; i < numberToMove; i++ {
+			crateToMove, _ := stacks[fromStack-1].Pop()
+			cratesToMove = append(cratesToMove, crateToMove)
+		}
+
+		stacks[toStack-1].AddCrates(cratesToMove)
+	}
+
+	output := ""
+	for _, stack := range stacks {
+		output += stack[0]
+	}
+
+	fmt.Println(output)
 }
 
-type Coordinate struct {
-	x int
-	y int
+func input() ([]string, []string) {
+	test := openCSV("./input/testInput.csv")
+	data := openCSV("./input/input.csv")
+	return test, data
+}
+
+func openCSV(fileName string) []string {
+	data := []string{}
+
+	f, err := os.Open(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	csvReader := csv.NewReader(f)
+	for {
+		rec, err := csvReader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		data = append(data, rec...)
+	}
+
+	return data
+}
+
+type Stack []string
+
+func (s *Stack) IsEmpty() bool {
+	return len(*s) == 0
+}
+
+func (s *Stack) Push(str string) {
+	*s = append(*s, str)
+}
+
+// prepend
+func (s *Stack) AddCrate(str string) {
+	*s = append([]string{str}, *s...)
+}
+
+func (s *Stack) AddCrates(strs []string) {
+	*s = append(strs, *s...)
+}
+
+func (s *Stack) Pop() (string, bool) {
+	if s.IsEmpty() {
+		return "", false
+	} else {
+		element := (*s)[0]
+		*s = (*s)[1:]
+		return element, true
+	}
 }

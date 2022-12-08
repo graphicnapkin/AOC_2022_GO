@@ -3,12 +3,13 @@ read -p 'What day is this for?
 ' dayNumber
 
 read -p 'Copy test data to clipboard and hit enter
-'
-testData=$(eval "powershell.exe Get-Clipboard | sed 's/\r//' | sed 's/.*/\"&\"/' | sed -z 's/\n/,/g;s/,$/\n/'")
+' > /dev/null
+testData=$(eval "pbcopy")
 
 read -p 'Copy real data to clipboard and hit enter
-'
-realData=$(eval "powershell.exe Get-Clipboard | sed 's/\r//' | sed 's/.*/\"&\"/' | sed -z 's/\n/,/g;s/,$/\n/'")
+' > /dev/null 
+
+realData=$(eval "pbcopy")
 
 dirName="day"$dayNumber
 mkdir $dirName 
