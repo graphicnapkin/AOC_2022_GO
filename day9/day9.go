@@ -98,52 +98,10 @@ func part2(data []string) {
 		direction := movement[0]
 		moves, _ := strconv.Atoi(movement[1])
 
-		// make function to change head postion once per move
-		// make function to comapare two positions after every move and determine if it needs to move
-		// check only last tail position and add to tail position map
 		for i := 0; i < moves; i++ {
 			changeHeadPosition(direction, headPos)
 			changeTailPositions(headPos, tailPositions, lastTailPosition)
-			gridSize := 30
-			offset := 10
-
-			if direction == "U" && moves == 4 {
-				grid := make([][]string, gridSize)
-				for y := 0; y < gridSize; y++ {
-					grid[y] = make([]string, gridSize)
-				}
-
-				for y := 0; y < gridSize; y++ {
-					for x := 0; x < gridSize; x++ {
-						offSetHead := []int{headPos[0] + offset, headPos[1] + offset}
-
-						if x == offSetHead[0] && y == offSetHead[1] {
-							grid[y][x] = "H"
-						}
-
-						for i, tail := range tailPositions {
-							offSetTail := []int{tail[0] + offset, tail[1] + offset}
-							if x == offSetTail[0] && y == offSetTail[1] {
-								grid[y][x] = fmt.Sprint(i + 1)
-							}
-						}
-
-						if grid[y][x] == "" {
-							grid[y][x] = "."
-						}
-					}
-				}
-				fmt.Println("==" + direction + fmt.Sprint(moves) + "==")
-				for _, row := range grid {
-					fmt.Println(row)
-				}
-
-				fmt.Println("--------------------\n\n\n")
-
-			}
-
 		}
-
 	}
 
 	fmt.Println(len(lastTailPosition))
@@ -203,12 +161,12 @@ func changeTailPositions(headPos []int, tailPositions [][]int, tailPositionsMap 
 			tailPositions[i][1]++
 			tailPositions[i][0] = comparePos[0]
 		}
-		// if head x is more than one to the right of tail x
+		// if head x is more than one to the RIGHT of tail x
 		if comparePos[0]-tailPositions[i][0] > 1 {
 			tailPositions[i][0]++
 			tailPositions[i][1] = comparePos[1]
 		}
-		// if head x is more than one to the left of tail x
+		// if head x is more than one to the LEFT of tail x
 		if comparePos[0]-tailPositions[i][0] < -1 {
 			tailPositions[i][0]--
 			tailPositions[i][1] = comparePos[1]
@@ -222,13 +180,6 @@ func changeTailPositions(headPos []int, tailPositions [][]int, tailPositionsMap 
 
 func makeCord(spot []int) string {
 	return fmt.Sprintf("%v,%v", strconv.Itoa(spot[0]), strconv.Itoa(spot[1]))
-}
-
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
 }
 
 func input() ([]string, []string) {
@@ -261,7 +212,3 @@ func openCSV(fileName string) []string {
 
 	return data
 }
-
-/**
-
-**/
