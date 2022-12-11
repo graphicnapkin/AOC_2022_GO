@@ -182,6 +182,13 @@ func makeCord(spot []int) string {
 	return fmt.Sprintf("%v,%v", strconv.Itoa(spot[0]), strconv.Itoa(spot[1]))
 }
 
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
 func input() ([]string, []string) {
 	test := openCSV("./input/testInput.csv")
 	data := openCSV("./input/input.csv")
@@ -212,3 +219,7 @@ func openCSV(fileName string) []string {
 
 	return data
 }
+
+/**
+
+**/
