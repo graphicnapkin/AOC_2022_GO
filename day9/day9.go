@@ -13,7 +13,7 @@ import (
 func main() {
 	//[testData, realData]
 	_, data := input()
-	//part1(data)
+	part1(data)
 	part2(data)
 }
 
