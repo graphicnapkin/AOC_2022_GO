@@ -15,10 +15,17 @@ func main() {
 	//[testData, realData]
 	_, data := input()
 	part1(data)
+	part2()
 }
 
 func part1(data []string) {
 	fmt.Println("Part 1")
+	startX, startY := buildGrid(data)
+
+	fmt.Println(BFS(startX, startY))
+}
+
+func buildGrid(data []string) (int, int) {
 	startX := 0
 	startY := 0
 
@@ -31,7 +38,6 @@ func part1(data []string) {
 				height: int(location),
 			}
 			if location == 'S' {
-				node.start = true
 				node.height = int('a')
 				startX = x
 				startY = y
@@ -53,9 +59,7 @@ func part1(data []string) {
 			grid[y][x] = node
 		}
 	}
-
-	fmt.Println(BFS(startX, startY))
-	part2(grid)
+	return startX, startY
 }
 
 func BFS(x int, y int) int {
@@ -119,7 +123,7 @@ func getNeigbors(x int, y int, grid [][]node) [][]int {
 	return neighbors
 }
 
-func part2(grid [][]node) {
+func part2() {
 	fmt.Println("Part 2")
 	lowPoints := [][]int{}
 	lowest := 100000000
@@ -141,6 +145,19 @@ func part2(grid [][]node) {
 
 	fmt.Println(lowest)
 }
+
+type (
+	node struct {
+		name      string
+		end       bool
+		height    int
+		neighbors [][]int
+	}
+	queueItem struct {
+		node
+		distance int
+	}
+)
 
 func input() ([]string, []string) {
 	test := openFile("./input/testInput.txt")
@@ -178,16 +195,4 @@ func Readln(r *bufio.Reader) (string, error) {
 		ln = append(ln, line...)
 	}
 	return string(ln), err
-}
-
-type node struct {
-	name      string
-	start     bool
-	end       bool
-	height    int
-	neighbors [][]int
-}
-type queueItem struct {
-	node
-	distance int
 }
