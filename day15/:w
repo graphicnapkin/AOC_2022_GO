@@ -1,0 +1,161 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"log"
+	"math"
+	"os"
+	"strconv"
+	"strings"
+)
+
+var (
+  answer = 0
+  targetRow = 2000000
+  positions = make(map[string]bool)
+  skipPos = make(map[string]bool)
+)
+
+func main() {
+	//[testData, realData]
+	_, data := input()
+	part1(data)
+	part2()
+}
+
+type sensor struct {
+	x              int
+	y              int
+	beaconDistance int
+	beaconX        int
+	beaconY        int
+}
+
+func manhattanDistance(x1 int, y1 int, x2 int, y2 int) int {
+	return int(math.Abs(float64(x1-x2)) + math.Abs(float64(y1-y2)))
+}
+
+func part1(data []string) {
+	sensors := []sensor{}
+	fmt.Println("Part 1")
+
+
+	for _, row := range data {
+		row = strings.Replace(row, "Sensor at x=", "", 1)
+		row = strings.Replace(row, " y=", "", 2)
+		row = strings.Replace(row, " closest beacon is at x=", "", 1)
+		items := strings.Split(row, ":")
+
+		beaconPos := strings.Split(items[1], ",")
+		beaconX, _ := strconv.Atoi(beaconPos[0])
+		beaconY, _ := strconv.Atoi(beaconPos[1])
+    if beaconY == targetRow{
+      fmt.Println("ignore")
+      skipPos[fmt.Sprint(beaconX,beaconY)] = true
+    }
+
+		sensorPos := strings.Split(items[0], ",")
+		x, _ := strconv.Atoi(sensorPos[0])
+		y, _ := strconv.Atoi(sensorPos[1])
+
+		distance := manhattanDistance(x, y, beaconX, beaconY)
+		sensors = append(sensors, sensor{x, y, distance, beaconX, beaconY})
+	}
+
+  fmt.Println("Made sensors", len(sensors))
+
+	for _, sensor := range sensors {
+    checkPositions(sensor)
+	}
+
+  for k, v := range skipPos{
+    positions.delete(k)
+  }
+
+  fmt.Println("Answer", len(positions))
+}
+
+func checkPositions(s sensor){
+  halfWay := false
+  currentY := s.y - s.beaconDistance
+  width := 0
+  for currentY < s.y + s.beaconDistance{
+    if currentY == targetRow{
+      startX := s.x - width
+      endX := s.x + width
+
+      if startX == endX {
+        pos := fmt.Sprint(startX,currentY)
+        if !skipPos[pos]{
+          positions[pos] = true
+        }
+      }
+
+      for i:= startX; i <= endX; i++{
+        pos := fmt.Sprint(i,currentY)
+        if skipPos[pos] {
+          fmt.Println(skipPos[pos], pos)
+        }
+        if !skipPos[pos]{
+          positions[pos] = true
+        }
+      }
+    }
+
+    if width == s.beaconDistance{
+      halfWay = true
+    }
+
+    if !halfWay && width < s.beaconDistance {
+      width ++
+    }
+
+    if halfWay && width > s.beaconDistance{
+      width --
+    }
+    currentY++
+  }
+}
+
+func part2() {
+	fmt.Println("Part 2")
+}
+
+func input() ([]string, []string) {
+	test := openFile("./input/testInput.txt")
+	data := openFile("./input/input.txt")
+	return test, data
+}
+
+func openFile(fileName string) []string {
+	data := []string{}
+
+	f, err := os.Open(fileName)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer f.Close()
+
+	r := bufio.NewReader(f)
+	s, e := Readln(r)
+	for e == nil {
+		data = append(data, s)
+		s, e = Readln(r)
+	}
+
+	return data
+}
+
+func Readln(r *bufio.Reader) (string, error) {
+	var (
+		isPrefix bool  = true
+		err      error = nil
+		line, ln []byte
+	)
+	for isPrefix && err == nil {
+		line, isPrefix, err = r.ReadLine()
+		ln = append(ln, line...)
+	}
+	return string(ln), err
+}
