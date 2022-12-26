@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
-  //"time"
+	//"time"
 )
 
 var minX = 10000
@@ -25,35 +25,35 @@ func part1(data []string) {
 	fmt.Println("Part 1")
 
 	gridSize := 1000
-  emptyRow := []string{}
+	emptyRow := []string{}
 	for i := 0; i < gridSize; i++ {
-    emptyRow = append(emptyRow, ".")
+		emptyRow = append(emptyRow, ".")
 	}
 
 	//setup grid
 	grid := make(Grid, gridSize)
 	for i := range grid {
 		row := []string{}
-		grid[i] = append(row,emptyRow...)
+		grid[i] = append(row, emptyRow...)
 	}
 
 	setInitialState(grid, data)
 
-  start := coord{500,0}
+	start := coord{500, 0}
 
-  i := 0
+	i := 0
 
-  for {
-    done := dropSand(grid,start, i)
-    if done {
-      break
-    }
-    i++
-  }
-  fmt.Println("Answer", i)
+	for {
+		done := dropSand(grid, start, i)
+		if done {
+			break
+		}
+		i++
+	}
+	fmt.Println("Answer", i)
 }
 
-func setInitialState(grid [][]string, data []string){
+func setInitialState(grid [][]string, data []string) {
 	for _, row := range data {
 		coords := []coord{}
 		items := strings.Split(row, " -> ")
@@ -62,17 +62,17 @@ func setInitialState(grid [][]string, data []string){
 			x, _ := strconv.Atoi(cordPair[0])
 			y, _ := strconv.Atoi(cordPair[1])
 			coords = append(coords, coord{x, y})
-      if x < minX{
-        minX = x
-      }
+			if x < minX {
+				minX = x
+			}
 
-      if x > maxX{
-        maxX = x
-      }
+			if x > maxX {
+				maxX = x
+			}
 
-      if y > maxY {
-        maxY = y
-      }
+			if y > maxY {
+				maxY = y
+			}
 		}
 
 		for i, cur := range coords {
@@ -80,8 +80,8 @@ func setInitialState(grid [][]string, data []string){
 				continue
 			}
 			next := coords[i+1]
-      grid[cur.y][cur.x] = "#"
-      grid[next.y][next.x] = "#"
+			grid[cur.y][cur.x] = "#"
+			grid[next.y][next.x] = "#"
 
 			// if x's are the same, draw vertical
 			if cur.x == next.x {
@@ -112,62 +112,62 @@ func setInitialState(grid [][]string, data []string){
 			}
 		}
 	}
-  lastRow := []string{}
+	lastRow := []string{}
 	for i := 0; i < 1000; i++ {
-    lastRow = append(lastRow, "#")
+		lastRow = append(lastRow, "#")
 	}
-  grid[maxY+2] =lastRow
+	grid[maxY+2] = lastRow
 }
 
 type Grid [][]string
 
-func (g *Grid)printGrid(){
-    for j := 0; j < 20; j++{
-      fmt.Println("")
-    }
-	  for i, row := range (*g){
-      if i <= maxY + 2 {
-        fmt.Println(row[minX-5:maxX+10])
-      }
-	  }
+func (g *Grid) printGrid() {
+	for j := 0; j < 20; j++ {
+		fmt.Println("")
+	}
+	for i, row := range *g {
+		if i <= maxY+2 {
+			fmt.Println(row[minX-5 : maxX+10])
+		}
+	}
 }
 
-//returns boolean for done
+// returns boolean for done
 func dropSand(grid Grid, cur coord, moves int) bool {
-  // part 1
-  //if cur.y + 1 > maxY || cur.x-1 < minX || cur.x > maxX{
+	// part 1
+	//if cur.y + 1 > maxY || cur.x-1 < minX || cur.x > maxX{
+	down := coord{cur.x, cur.y + 1}
+	if grid.getSpot(down) == "." {
+		return dropSand(grid, down, moves)
+	}
 
-  down := coord{cur.x,cur.y+1}
-  if grid.getSpot(down) == "."{
-    return dropSand(grid, down, moves)
-  }
+	downLeft := coord{cur.x - 1, cur.y + 1}
+	if grid.getSpot(downLeft) == "." {
+		return dropSand(grid, downLeft, moves)
+	}
 
-  downLeft := coord{cur.x-1,cur.y+1}
-  if grid.getSpot(downLeft)== "."{
-    return dropSand(grid, downLeft, moves)
-  }
+	downRight := coord{cur.x + 1, cur.y + 1}
+	if grid.getSpot(downRight) == "." {
+		return dropSand(grid, downRight, moves)
+	}
 
-  downRight := coord{cur.x+1,cur.y+1}
-  if grid.getSpot(downRight)== "."{
-    return dropSand(grid, downRight, moves)
-  }
+	if grid.getSpot(cur) == "o" {
+		return true
+	}
 
-  if grid.getSpot(cur) == "o"{
-    return true
-  }
-  grid.setSpot(cur, "o")
-  return false
+	grid.setSpot(cur, "o")
+	return false
 }
 
-func (g *Grid)setSpot(spot coord, val string){
-  (*g)[spot.y][spot.x] = val
+func (g Grid) setSpot(spot coord, val string) {
+	g[spot.y][spot.x] = val
 }
 
-func (g *Grid)getSpot(spot coord) string{
-  if spot.x > 999 || spot.y > 999 {
-    fmt.Println(spot)
-  }
-  return (*g)[spot.y][spot.x]
+func (g Grid) getSpot(spot coord) string {
+	if spot.x > 999 || spot.y > 999 {
+		fmt.Println(spot)
+	}
+	return g[spot.y][spot.x]
 }
 
 type coord struct {
