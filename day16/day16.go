@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
@@ -17,6 +19,35 @@ func main() {
 
 func part1(data []string) {
 	fmt.Println("Part 1")
+	tunnels := make(map[string]tunnel)
+	distanceToTunnel := make(map[string]int)
+
+	for _, row := range data {
+		row = strings.Replace(row, "Valve ", "", 1)
+		row = strings.Replace(row, " has flow rate=", ",", 1)
+		row = strings.Replace(row, "; tunnels lead to valves ", ",", 1)
+		row = strings.Replace(row, "; tunnel leads to valve ", ",", 1)
+		row = strings.ReplaceAll(row, " ", "")
+
+		items := strings.Split(row, ",")
+		rate, _ := strconv.Atoi(items[1])
+		tun := tunnel{
+			name:      items[0],
+			rate:      rate,
+			neighbors: items[2:],
+		}
+		tunnels[tun.name] = tun
+	}
+
+	for _, v := range tunnels {
+		fmt.Printf("%+v\n", v)
+	}
+}
+
+type tunnel struct {
+	name      string
+	rate      int
+	neighbors []string
 }
 
 func part2() {
