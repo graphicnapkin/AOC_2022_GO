@@ -126,6 +126,7 @@ func takeMove(move Move) ([]Move, int, string) {
 				move.pressure + tun.rate*(move.mins-distance-1),
 				move.path + "->" + tun.name,
 			})
+
 		}
 	}
 	return queue, move.pressure, move.path
